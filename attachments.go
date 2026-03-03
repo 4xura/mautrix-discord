@@ -290,6 +290,34 @@ func (br *DiscordBridge) convertVideoThumbnailToWebP(data []byte) ([]byte, strin
 	return converted, "image/webp", nil
 }
 
+func (br *DiscordBridge) convertGIFVToGIF(data []byte, autoMaxSize int, autoMode bool, fps int, maxWidth int) ([]byte, string, error) {
+	if autoMode && autoMaxSize > 0 && len(data) > autoMaxSize {
+		return data, "video/mp4", nil
+	}
+	if fps <= 0 {
+		fps = 8
+	}
+	if maxWidth <= 0 {
+		maxWidth = 320
+	}
+	converted, err := ffmpeg.ConvertBytes(
+		context.Background(),
+		data,
+		".gif",
+		nil,
+		[]string{
+			"-vf", fmt.Sprintf("fps=%d,scale=%d:-1:flags=lanczos:force_original_aspect_ratio=decrease", fps, maxWidth),
+			"-loop", "0",
+			"-f", "gif",
+		},
+		"video/mp4",
+	)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to convert GIFV to GIF: %w", err)
+	}
+	return converted, "image/gif", nil
+}
+
 func (br *DiscordBridge) copyAttachmentToMatrix(intent *appservice.IntentAPI, url string, encrypt bool, meta AttachmentMeta) (returnDBFile *database.File, returnErr error) {
 	isCacheable := br.Config.Bridge.CacheMedia != "never" && (br.Config.Bridge.CacheMedia == "always" || !encrypt)
 	returnDBFile = br.DB.File.Get(url, encrypt)

@@ -208,6 +208,18 @@ bridge:
             width: 320
             height: 320
             fps: 25 # only for webm, webp and gif (2, 5, 10, 20 or 25 recommended)
+    # Settings for Discord GIFV/Tenor embeds.
+    gifv:
+        # video - relay as m.video (default)
+        # gif - always convert to m.image image/gif
+        # auto - convert to GIF only when source size is below auto_max_size
+        mode: video
+        # Max input bytes for auto mode GIF conversion.
+        auto_max_size: 512000
+        # Arguments for GIF conversion quality/size tuning.
+        args:
+            fps: 8
+            max_width: 320
     # Servers to always allow double puppeting from
     double_puppet_server_map:
         example.com: https://example.com

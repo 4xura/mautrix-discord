@@ -70,6 +70,14 @@ type BridgeConfig struct {
 			FPS    int `yaml:"fps"`
 		} `yaml:"args"`
 	} `yaml:"animated_sticker"`
+	GIFV struct {
+		Mode        string `yaml:"mode"`
+		AutoMaxSize int    `yaml:"auto_max_size"`
+		Args        struct {
+			FPS      int `yaml:"fps"`
+			MaxWidth int `yaml:"max_width"`
+		} `yaml:"args"`
+	} `yaml:"gifv"`
 
 	DoublePuppetConfig bridgeconfig.DoublePuppetConfig `yaml:",inline"`
 
@@ -169,6 +177,24 @@ func (bc *BridgeConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	bc.guildNameTemplate, err = template.New("guild_name").Parse(bc.GuildNameTemplate)
 	if err != nil {
 		return err
+	}
+	bc.GIFV.Mode = strings.ToLower(strings.TrimSpace(bc.GIFV.Mode))
+	if bc.GIFV.Mode == "" {
+		bc.GIFV.Mode = "video"
+	}
+	switch bc.GIFV.Mode {
+	case "video", "gif", "auto":
+	default:
+		return fmt.Errorf("invalid bridge.gifv.mode %q (allowed: video, gif, auto)", bc.GIFV.Mode)
+	}
+	if bc.GIFV.AutoMaxSize <= 0 {
+		bc.GIFV.AutoMaxSize = 512000
+	}
+	if bc.GIFV.Args.FPS <= 0 {
+		bc.GIFV.Args.FPS = 8
+	}
+	if bc.GIFV.Args.MaxWidth <= 0 {
+		bc.GIFV.Args.MaxWidth = 320
 	}
 
 	return nil
