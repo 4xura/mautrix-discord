@@ -25,6 +25,7 @@ This fork is focused on practical forum-thread operations.
 - Explicit rejection of forum parent channel IDs in `!discord bridge`
 - Matrix -> Discord relay support for thread portals when webhook relay is configured
 - Thread-friendly relay webhook setup behavior (`set-relay` handles parent-channel webhook target)
+- Configurable Discord GIFV handling modes (`video`, `gif`, `auto`)
 - Optional bot-visible debug mode for troubleshooting
 
 Out of scope by design:
@@ -108,9 +109,30 @@ In your server `vars.yml`:
 ```yaml
 matrix_mautrix_discord_container_image_self_build: true
 matrix_mautrix_discord_container_image_self_build_repo: "https://github.com/4xura/mautrix-discord.git"
-matrix_mautrix_discord_container_image_self_build_branch: "main"
+matrix_mautrix_discord_container_image_self_build_branch: "ext/gifv-mode-toggle"
 matrix_mautrix_discord_version: "forum-thread-test-20260302"
 ```
+
+GIFV mode override (recommended via extension YAML):
+
+```yaml
+matrix_mautrix_discord_configuration_extension_yaml: |
+  bridge:
+    gifv:
+      # video | gif | auto
+      mode: video
+      # used only when mode: auto (bytes)
+      auto_max_size: 512000
+      args:
+        # used when converting to gif
+        fps: 8
+        max_width: 320
+```
+
+Mode behavior:
+- `video`: keep Discord GIFV as `m.video` (`mp4`), lowest bridge CPU/load.
+- `gif`: always convert Discord GIFV to `m.image` (`gif`), higher CPU and often larger files.
+- `auto`: convert to GIF only when source size is `<= auto_max_size`, otherwise keep video.
 
 Optional debug toggle:
 
