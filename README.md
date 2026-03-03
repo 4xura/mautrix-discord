@@ -174,6 +174,8 @@ On Element mobile specifically, GIFV video posts could look broken/low-context:
 The goal was to keep efficient MP4 relay while making mobile preview usable.
 
 > Attempting to transcode Discord MP4 used by GIFV to GIF in Matrix is too expensive (oversized output and extra compute), so this fork keeps GIFV as MP4 (`m.video`).
+>
+> If we do want GIF instead of GIFV/video/MP4, use the [ext/gifv-mode-toggle](https://github.com/4xura/mautrix-discord/tree/main) branch in this repo — this allows us to convert all relayed GIFs (actually videos) into real GIFs locally. Change vars to adjust GIF parameters according to the README.
 
 #### Files changed
 
